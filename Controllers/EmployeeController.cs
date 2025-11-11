@@ -15,7 +15,7 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> getAllEmployees(string search, int page = 1)
+    public async Task<ActionResult> getAllEmployees(string search = "", int page = 1)
     {
         int pageSize = 3;
 
@@ -29,7 +29,6 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> createNewEmployee([FromBody] EmployeeCreateDto employeeCreateDto)
     {
         if (ModelState.IsValid)
@@ -50,7 +49,7 @@ public class EmployeeController : ControllerBase
         return Ok(new
         {
             message = "Request Successfull",
-            employeeUpdateDto
+            data = employeeUpdateDto
         });
     }
 
@@ -61,6 +60,7 @@ public class EmployeeController : ControllerBase
         return Ok(new { message = "Employee Update Successfully!" });
     }
 
+    [HttpDelete("delete/{id}")]
     public async Task<ActionResult> DeleteEmployee(int id)
     {
         await _employeeService.DeleteEmployee(id);

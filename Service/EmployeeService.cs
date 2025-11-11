@@ -41,7 +41,7 @@ public class EmployeeService : IEmployeeService
     public async Task<(List<EmployeeDto>, int)> GetAllEmployee(string search = "", int pageSize = 3, int pageNumber = 1)
     {
         var query = _context.Employees.AsQueryable();
-        if (!string.IsNullOrEmpty(search))
+        if (!string.IsNullOrWhiteSpace(search))
         {
             search = search.ToLower();
             query = query.Where(e =>
@@ -70,6 +70,7 @@ public class EmployeeService : IEmployeeService
     {
         var employee = new Employee
         {
+            Id = employeeDto.Id,
             Name = employeeDto.Name,
             Department = employeeDto.Department,
             Email = employeeDto.Email
