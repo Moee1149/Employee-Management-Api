@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using MyMvcApp.IService;
-using MyMvcApp.Service;
+using MyWebApiApp.IService;
+using MyWebApiApp.Service;
 using MyWebApiApp.Data;
+using MyWebApiApp.Iservice;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 
 var app = builder.Build();

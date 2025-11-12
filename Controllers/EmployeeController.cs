@@ -1,17 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
-using MyMvcApp.IService;
+using MyWebApiApp.IService;
 using MyWebApiApp.Dto;
+using MyWebApiApp.Iservice;
 
-namespace MyMvcApp.Controllers;
+namespace MyWebApiApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class EmployeeController : ControllerBase
 {
     private readonly IEmployeeService _employeeService;
-    public EmployeeController(IEmployeeService employeeService)
+    private readonly IFileService _fileSevice;
+    public EmployeeController(IEmployeeService employeeService, IFileService fileservice)
     {
         _employeeService = employeeService;
+        _fileSevice = fileservice;
     }
 
     [HttpGet]
@@ -76,6 +79,24 @@ public class EmployeeController : ControllerBase
     {
         await _employeeService.DeleteEmployee(id);
         return Ok(new { message = "Employee Deleted Successfully!" });
+    }
+
+    [HttpPost("upload")]
+    public async Task<ActionResult> UploadFileToDisk(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("Invalid file");
+        try
+        {
+            await _fileSevice.SaveFileToDisk(file);
+            return Ok("File Uploaded Sucessfllyj");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error uploading file: " + e);
+            return StatusCode(500, new { message = "An error occured while uploading the file" });
+        }
+
     }
 }
 
