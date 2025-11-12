@@ -18,14 +18,25 @@ public class EmployeeController : ControllerBase
     public async Task<ActionResult> getAllEmployees(string search = "", int page = 1)
     {
         int pageSize = 3;
-
-        var (employee, totalCount) = await _employeeService.GetAllEmployee(search, pageSize, page);
-        return Ok(new
+        try
         {
-            Employees = employee,
-            TotalCount = totalCount,
-            PageSize = pageSize
-        });
+            var (employee, totalCount) = await _employeeService.GetAllEmployee(search, pageSize, page);
+            return Ok(new
+            {
+                data = new
+                {
+                    Employees = employee,
+                    TotalCount = totalCount,
+                    PageSize = pageSize
+                },
+                message = "Request Sucessfull"
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, new { message = "An error occured" });
+        }
     }
 
     [HttpPost]
@@ -53,7 +64,7 @@ public class EmployeeController : ControllerBase
         });
     }
 
-    [HttpPut("edit/{id}")]
+    [HttpPut("edit")]
     public async Task<ActionResult> updateEmployeeData([FromBody] EmployeeUpdateDto employeeUpdateDto)
     {
         await _employeeService.UpdateEmployee(employeeUpdateDto);

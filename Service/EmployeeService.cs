@@ -81,7 +81,7 @@ public class EmployeeService : IEmployeeService
 
     public async Task<EmployeeDto> GetEmployeeById(int employeeId)
     {
-        Employee employee = await _context.Employees.FindAsync(employeeId) ?? new Employee { };
+        Employee? employee = await _context.Employees.FindAsync(employeeId);
         if (employee == null)
         {
             throw new Exception("employee not found");
