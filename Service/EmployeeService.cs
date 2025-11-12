@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using MyWebApiApp.Data;
-using MyMvcApp.IService;
+using MyWebApiApp.IService;
 using MyWebApiApp.Models;
 using MyWebApiApp.Dto;
 
-namespace MyMvcApp.Service;
+namespace MyWebApiApp.Service;
 
 public class EmployeeService : IEmployeeService
 {

@@ -1,7 +1,6 @@
 using MyWebApiApp.Dto;
-using MyWebApiApp.Models;
 
-namespace MyMvcApp.IService;
+namespace MyWebApiApp.IService;
 
 public interface IEmployeeService
 {

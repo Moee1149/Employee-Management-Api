@@ -2,7 +2,9 @@ namespace MyWebApiApp.Iservice;
 
 public interface IFileService
 {
-    public Task SaveFileToDisk(IFormFile file);
-    public Task GetFileFromDisk();
+    public Task<string> SaveFileToDisk(IFormFile file);
+    public Task<byte[]> GetFileFromDisk(string fileName);
+
+    public List<string> GetAllFiles();
 }
 

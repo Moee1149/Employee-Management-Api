@@ -1,4 +1,3 @@
-
 using MyWebApiApp.Iservice;
 
 namespace MyWebApiApp.Service;
@@ -13,12 +12,24 @@ public class FileService : IFileService
         Directory.CreateDirectory(_uploadPath);
     }
 
-    public Task GetFileFromDisk()
+    public List<string> GetAllFiles()
     {
-        throw new NotImplementedException();
+        var fileNames = Directory.GetFiles(_uploadPath).Select(Path.GetFileName).Where(name => name != null).Cast<string>().ToList();
+        return fileNames;
     }
 
-    public async Task SaveFileToDisk(IFormFile file)
+    public async Task<byte[]> GetFileFromDisk(string fileName)
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", fileName);
+
+        if (!System.IO.File.Exists(path))
+            throw new Exception("File doesn't exits");
+
+        var bytes = await System.IO.File.ReadAllBytesAsync(path);
+        return bytes;
+    }
+
+    public async Task<string> SaveFileToDisk(IFormFile file)
     {
         var filePath = Path.Combine(_uploadPath, file.FileName);
 
@@ -27,5 +38,6 @@ public class FileService : IFileService
             await file.CopyToAsync(stream);
             Console.WriteLine("file writeto disk");
         }
+        return filePath;
     }
 }

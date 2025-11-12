@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyWebApiApp.IService;
 using MyWebApiApp.Dto;
 using MyWebApiApp.Iservice;
+using System.Threading.Tasks;
 
 namespace MyWebApiApp.Controllers;
 
@@ -88,15 +89,44 @@ public class EmployeeController : ControllerBase
             return BadRequest("Invalid file");
         try
         {
-            await _fileSevice.SaveFileToDisk(file);
-            return Ok("File Uploaded Sucessfllyj");
+            string filePath = await _fileSevice.SaveFileToDisk(file);
+            return Ok(new
+            {
+                message = "File Uploaded Sucessfllyj",
+                filePath
+            });
         }
         catch (Exception e)
         {
             Console.WriteLine("Error uploading file: " + e);
             return StatusCode(500, new { message = "An error occured while uploading the file" });
         }
-
     }
-}
 
+    [HttpGet("download/{filename}")]
+    public async Task<ActionResult> DownloadFileFromDisk(string fileName)
+    {
+        try
+        {
+            var files = await _fileSevice.GetFileFromDisk(fileName);
+            return File(files, "application/octet-stream");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error downloading file: " + e);
+            return BadRequest(new { message = "Error downloading file" });
+        }
+    }
+
+    [HttpGet("files")]
+    public ActionResult GetAllFiles()
+    {
+        var files = _fileSevice.GetAllFiles();
+        return Ok(new
+        {
+            data = files,
+            message = "List of all files"
+        });
+    }
+
+}

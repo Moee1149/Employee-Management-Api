@@ -1,9 +1,6 @@
 namespace MyWebApiApp.Dto;
 
-public class EmployeeUpdateDto
+public class EmployeeUpdateDto : EmployeeBaseDto
 {
     public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string Department { get; set; } = "";
-    public string Email { get; set; } = "";
 }
