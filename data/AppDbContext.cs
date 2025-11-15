@@ -11,4 +11,5 @@ public class AppDbContext : DbContext
 
     // Example table
     public DbSet<Employee> Employees { get; set; }
+    public DbSet<User> Users { get; set; }
 }
