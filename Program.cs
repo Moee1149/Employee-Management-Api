@@ -3,6 +3,7 @@ using MyWebApiApp.IService;
 using MyWebApiApp.Service;
 using MyWebApiApp.Data;
 using MyWebApiApp.Iservice;
+using MyWebApiApp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IFileService, FileService>();
-
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 

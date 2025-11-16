@@ -1,70 +1,57 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using MyWebApiApp.Dto;
+using MyWebApiApp.Iservice;
 using MyWebApiApp.Models;
 
 namespace MyWebApiApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController(IConfiguration configuration) : ControllerBase
+public class AuthController(IAuthService _authService) : ControllerBase
 {
-    public static User user = new();
     [HttpPost("register")]
-    public ActionResult<User> Register(UserDto request)
+    public async Task<ActionResult<User>> Register(UserDto request)
     {
-        var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
-        user.Username = request.Username;
-        user.HashedPassword = hashedPassword;
-        return Ok(user);
+        try
+        {
+            var user = await _authService.RegisterUser(request);
+            if (user == null)
+            {
+                return BadRequest(new { message = "User with this name alread exits." });
+            }
+            return Ok(new
+            {
+                Data = user,
+                message = "User Register Succesfully"
+            });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error registering User: {e}");
+            return StatusCode(500, new { message = "Error creating new user" });
+        }
     }
 
     [HttpPost("login")]
-    public ActionResult<string> Login(UserDto request)
+    public async Task<ActionResult<string>> Login(UserDto request)
     {
-        if (user.Username != request.Username)
+        if (request.Username is null || request.Password is null)
         {
-            return BadRequest("User Not Found");
+            return BadRequest("Username or password required");
         }
 
-        if (new PasswordHasher<User>().VerifyHashedPassword(user, user.HashedPassword, request.Password) == PasswordVerificationResult.Failed)
+        var token = await _authService.LoginUser(request);
+        if (token is null)
         {
-            return BadRequest("Username or passoword Wrong");
+            return BadRequest("Username or password is wrong");
         }
-        string token = CreateToken(user);
+
         return Ok(new
         {
             token,
-            message = "Login sucessfull"
+            message = "User login successfull"
         });
     }
 
-    private string CreateToken(User user)
-    {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.Username)
-        };
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!)
-        );
-
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-
-        var tokenDescriptor = new JwtSecurityToken(
-            issuer: configuration.GetValue<string>("AppSettings:Issuer"),
-            audience: configuration.GetValue<string>("AppSettings:Audience"),
-            claims: claims,
-            expires: DateTime.UtcNow.AddDays(1),
-            signingCredentials: creds
-        );
-        return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-    }
 }
